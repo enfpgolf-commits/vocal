@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="보컬 코치">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAEQElEQVR42u3dTU7jMBgG4FBVgvUcgR2XmMUIiSXiHD0P50CzROIes+s5ym4WSFUFbdqktmN/ft7VDD8Nqp9+dhzHufn1+88gciwrb4HAIXAIHAKHwCFwCBwCh8AhcIjAIXAIHAKHwCFwCBwCh8AhcIjAIXAIHAKHwCFwSN1Zewv+vf099a2Hl+ee35mbbm+kHjFBSb84JrHomUhfOGaz6JPIioylXgeOaDK68rEig49+ceRrxfA+VmTw0SOOMi0X2Ifpc+kPR8kPdNTioXJIZzjKf5RDFg+VQ+AQOBas8PF6FpVD4BA4BA6BQ+CQwa0JcmW2m93+3/evd3DIERmH/82nBI4mZZQpJ3C0LePUTyZRAkccGcnLCRwBZaQqJ05lg8sYzHOQcTYzOhc41Aw4yDAg7UTGtz4ikyc4mpdx+JVTrzDvbBaO5mWc+u715QSOODKmlhMD0k5lJPlFOILLcCpLBhxkwEFGDTLgIAMOMuCov+EbkgFHFh+nBLQlYzBDmruETJ2mrEcGHHVdf69Khm6lotQmAw4y4CADDjLgIAOO6I1duQw4svi4pNXrlzFEfcbbIrs+Hn3227d5jvvXu+1m14SMwSRYmY7mEEQrMnQrBp794Sj/dM+QzxNVOaQ/HCU/ylEfQ6xySJc4ynygAz+9fPl5jtx7a2ad84j9XPuFcRxdCzNC5GhLj7fQdrP7fHxfRMaMv3YwCTa+SirhfolfL3X78ZTcR+yasfCY45L1cyOLdace4vbjiYw2KsekJk9VSFLVj05kLINjdjHYbnaf1x3lq37MJtIPi2W6lRy7V/0c940f5eHleWozz/iVAM8DXLcl4/quYd837Rt7pBWTl4q2as86xg6Kh9fEpx6ot86iOhwF9ta85BCNXjqPjGPqnYAzJH0+vp89WS0pI8YDiNcV7jgwriTHjNbg4m35s5Ur7x6+cLHuvngoG81UjlT3lf8sJFOLRw1DjRaHvau2dl0d//mjYgrLCFM2hkxXZcvsRXGqGb6NTGvoUBo9W17F2/PqsH4YalRUOQrLKDm52cpfUmnlKF8zRt73kp/jkDJS4qhwz6syPuL1JolxLChj/KOZu+XGX7/1qzYJxhw11IyzCJK3U/kjtoejnt7kkiKRpMGKHahtHLWNMy7sRGa3XO7Xj4Ojzl1Xpw4y5t1e0MnqkJk4Kt+Pt57NW7o7W6l/p2ZbMFRdOSpZc1WghLhXdpqP2lbjZSISfvFp+rOVatdpJiTSyZrkxPMcTazgna2kt3XqKWdIW1zb3cNE58KX7BvaWzPkXglVX3hzPwgcAocIHAKHwCFwCBwCh8AhcAgcAofAIQKHwCFwCBwCh8AhcMhg9fkQ8OaUwS0tKofAIXAIHAKHwCFOZUXlEDgEDhE4BA6BQ+AQOAQOgUPgEDgEDoFDBA6BQ+AQOAQOgUPgEDgEDoFDBA6BQ+CQHPkPHFLm1zNGZwUAAAAASUVORK5CYII=">
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAEQElEQVR42u3dTU7jMBgG4FBVgvUcgR2XmMUIiSXiHD0P50CzROIes+s5ym4WSFUFbdqktmN/ft7VDD8Nqp9+dhzHufn1+88gciwrb4HAIXAIHAKHwCFwCBwCh8AhcIjAIXAIHAKHwCFwCBwCh8AhcIjAIXAIHAKHwCFwSN1Zewv+vf099a2Hl+ee35mbbm+kHjFBSb84JrHomUhfOGaz6JPIioylXgeOaDK68rEig49+ceRrxfA+VmTw0SOOMi0X2Ifpc+kPR8kPdNTioXJIZzjKf5RDFg+VQ+AQOBas8PF6FpVD4BA4BA6BQ+CQwa0JcmW2m93+3/evd3DIERmH/82nBI4mZZQpJ3C0LePUTyZRAkccGcnLCRwBZaQqJ05lg8sYzHOQcTYzOhc41Aw4yDAg7UTGtz4ikyc4mpdx+JVTrzDvbBaO5mWc+u715QSOODKmlhMD0k5lJPlFOILLcCpLBhxkwEFGDTLgIAMOMuCov+EbkgFHFh+nBLQlYzBDmruETJ2mrEcGHHVdf69Khm6lotQmAw4y4CADDjLgIAOO6I1duQw4svi4pNXrlzFEfcbbIrs+Hn3227d5jvvXu+1m14SMwSRYmY7mEEQrMnQrBp794Sj/dM+QzxNVOaQ/HCU/ylEfQ6xySJc4ynygAz+9fPl5jtx7a2ad84j9XPuFcRxdCzNC5GhLj7fQdrP7fHxfRMaMv3YwCTa+SirhfolfL3X78ZTcR+yasfCY45L1cyOLdace4vbjiYw2KsekJk9VSFLVj05kLINjdjHYbnaf1x3lq37MJtIPi2W6lRy7V/0c940f5eHleWozz/iVAM8DXLcl4/quYd837Rt7pBWTl4q2as86xg6Kh9fEpx6ot86iOhwF9ta85BCNXjqPjGPqnYAzJH0+vp89WS0pI8YDiNcV7jgwriTHjNbg4m35s5Ur7x6+cLHuvngoG81UjlT3lf8sJFOLRw1DjRaHvau2dl0d//mjYgrLCFM2hkxXZcvsRXGqGb6NTGvoUBo9W17F2/PqsH4YalRUOQrLKDm52cpfUmnlKF8zRt73kp/jkDJS4qhwz6syPuL1JolxLChj/KOZu+XGX7/1qzYJxhw11IyzCJK3U/kjtoejnt7kkiKRpMGKHahtHLWNMy7sRGa3XO7Xj4Ojzl1Xpw4y5t1e0MnqkJk4Kt+Pt57NW7o7W6l/p2ZbMFRdOSpZc1WghLhXdpqP2lbjZSISfvFp+rOVatdpJiTSyZrkxPMcTazgna2kt3XqKWdIW1zb3cNE58KX7BvaWzPkXglVX3hzPwgcAocIHAKHwCFwCBwCh8AhcAgcAofAIQKHwCFwCBwCh8AhcMhg9fkQ8OaUwS0tKofAIXAIHAKHwCFOZUXlEDgEDhE4BA6BQ+AQOAQOgUPgEDgEDoFDBA6BQ+AQOAQOgUPgEDgEDoFDBA6BQ+CQHPkPHFLm1zNGZwUAAAAASUVORK5CYII=">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>발라드 보컬 코치</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -85,6 +90,22 @@ input{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1
 .livehead{display:flex;align-items:baseline;gap:8px}
 .livehead .note{font-family:var(--display);font-size:26px;font-weight:800;line-height:1;min-width:1.6em}
 #liveCv{width:100%;height:84px;display:block;background:var(--bg);border-radius:8px;border:1px solid var(--line)}
+.recrow{grid-template-columns:auto minmax(0,1fr) auto!important}
+.sw{display:flex;flex-direction:column;gap:6px}
+.sw button{min-height:38px;font-size:13px;padding:4px 10px;justify-content:flex-start;min-width:104px}
+.sw button[aria-pressed="false"]{color:var(--muted);background:var(--bg);text-decoration:line-through;text-decoration-color:var(--bad)}
+.lyr{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 12px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;min-height:72px}
+.lyr .txt{min-width:0;text-align:center}
+.lyr .l1{font-size:19px;font-weight:700;line-height:1.3;color:var(--pitch);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lyr .l2{font-size:14px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lyr .ctl{display:flex;gap:4px;align-items:center}
+.lyr .ctl button{min-height:34px;padding:2px 9px;font-size:12px}
+.lyr.sync{border-color:var(--pitch)}
+.lit{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);cursor:pointer;text-align:left;width:100%;min-height:48px;font-weight:500}
+.lit b{display:block;font-size:14px}.lit span{font-size:12px;color:var(--muted)}
+.lit em{font-style:normal;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.tapbtn{background:var(--pitch)!important;color:#1A1205!important;border-color:var(--pitch)!important;font-size:15px!important;min-height:46px!important;padding:4px 16px!important}
+textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;min-height:220px;resize:vertical}
 .status{font-size:14px;color:var(--ink);background:var(--bg);border-radius:8px;padding:7px 10px;margin:0}
 
 /* lesson card */
@@ -156,6 +177,7 @@ dialog label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
   <h1>발라드 보컬 코치</h1>
   <div class="now" id="now">곡을 골라 주세요</div>
   <button class="primary" id="openSearch">🔍 노래 찾기</button>
+  <button id="homeBtn" hidden>📲 홈 화면에 추가</button>
   <button id="setBtn" aria-label="설정">설정</button>
 </header>
 
@@ -164,6 +186,8 @@ dialog label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
     <div class="varea" id="vArea">
       <div class="video" id="video"><div class="empty" id="videoEmpty"><b>먼저 연습할 노래를 골라 주세요</b><button class="primary" id="emptySearch">🔍 노래 찾기</button></div><div id="yt"></div></div>
     </div>
+    <div class="lyr" id="lyr"><div class="txt"><div class="l1" id="l1">가사창</div><div class="l2" id="l2">가사가 없는 영상이면 "가사 넣기"로 붙여넣으세요</div></div>
+      <div class="ctl" id="lyrCtl"><button id="lyrSlow" aria-label="가사 0.3초 늦게" hidden>◀ 늦게</button><button id="lyrFast" aria-label="가사 0.3초 빠르게" hidden>빠르게 ▶</button><button id="lyrAlign" hidden>첫 줄 맞추기</button><button id="lyrEdit">가사 넣기</button></div></div>
     <div class="pbar">
       <div class="chips" id="phrases" role="group" aria-label="구절"></div>
       <button id="addPh" aria-label="구절 추가" style="min-height:36px;padding:4px 10px">＋</button>
@@ -181,6 +205,10 @@ dialog label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
       <div class="live">
         <div class="livehead"><span class="note" id="liveNote">–</span><span class="hint" id="liveSub">부르는 동안 내 음정이 실시간으로 그려져요</span></div>
         <canvas id="liveCv"></canvas>
+      </div>
+      <div class="sw">
+        <button id="spkBtn" aria-pressed="true">🔊 반주 켬</button>
+        <button id="micBtn" aria-pressed="true">🎙 마이크 켬</button>
       </div>
     </div>
     <p class="status" id="status">노래를 고르고, 연습할 부분을 A·B로 정한 뒤 빨간 녹음 버튼을 누르세요.</p>
@@ -214,6 +242,27 @@ dialog label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
   <input id="aiKey" placeholder="sk-ant-…" autocomplete="off">
   <p class="hint">넣으면 Claude가 레슨을 써요. 비워 두면 내장 레슨이 나와요. 키는 이 아이패드에만 저장되고, 사용료는 Claude 구독과 별도예요.</p>
   <div class="row" style="margin-top:14px;justify-content:flex-end"><button id="dlgClose" class="primary">저장</button></div>
+</dialog>
+
+<dialog id="lyrDlg">
+  <h2 style="font-family:var(--display);margin:0">가사 넣기</h2>
+  <form id="lqForm" class="row" style="margin-top:10px"><input id="lq" class="grow" placeholder="곡명과 가수 (예: 성시경 거리에서)" autocomplete="off"><button class="primary" type="submit">가사 검색</button></form>
+  <div id="lres" class="list" style="max-height:200px;margin-top:8px"></div>
+  <p class="hint" style="margin-top:6px">검색 결과를 누르면 아래 칸에 가사가 들어가요. 못 찾으면 멜론·벅스 등에서 가사를 복사해 붙여넣으세요. 한 줄에 한 소절씩 넣으면 좋아요. 시간이 적힌 LRC 가사([01:23.45] 형식)를 넣으면 싱크가 자동으로 맞춰져요.</p>
+  <textarea id="lyrTx" placeholder="여기에 가사를 붙여넣으세요" style="min-height:160px"></textarea>
+  <div class="row" style="margin-top:12px;justify-content:flex-end"><button id="lyrCancel">닫기</button><button id="lyrSave">저장</button><button id="lyrSync" class="primary">저장하고 싱크 맞추기</button></div>
+</dialog>
+
+<dialog id="homeDlg">
+  <h2 style="font-family:var(--display);margin:0">홈 화면에 바로가기 만들기</h2>
+  <ol style="padding-left:20px;display:flex;flex-direction:column;gap:6px;margin:12px 0">
+    <li>Safari 오른쪽 위 <b>공유 버튼</b>(네모에 위쪽 화살표)을 눌러요.</li>
+    <li>목록을 내려 <b>"홈 화면에 추가"</b>를 눌러요.</li>
+    <li>이름이 <b>"보컬 코치"</b>인지 확인하고 오른쪽 위 <b>추가</b>를 눌러요.</li>
+    <li>홈 화면의 보컬 코치 아이콘을 누르면 주소창 없이 앱처럼 열려요.</li>
+  </ol>
+  <p class="hint">홈 화면 앱은 Safari와 기록을 따로 저장해요. 앞으로는 홈 화면 아이콘으로만 여는 게 좋아요.</p>
+  <div class="row" style="margin-top:12px;justify-content:flex-end"><button id="homeClose" class="primary">확인</button></div>
 </dialog>
 
 <script src="https://www.youtube.com/iframe_api"></script>
@@ -268,14 +317,14 @@ function ytError(e){
 }
 function load(vid){curVid=vid;if(!apiReady){pendingVid=vid;return}$('#videoEmpty').hidden=true;
   if(!player){player=new YT.Player('yt',{width:'100%',height:'100%',videoId:vid,playerVars:{playsinline:1,rel:0,enablejsapi:1,origin:location.origin},
-    events:{onReady:()=>{ready=true;if(pendingVid){const v=pendingVid;pendingVid=null;player.cueVideoById(v)}},onError:ytError}});return}
+    events:{onReady:()=>{ready=true;applySpk();if(pendingVid){const v=pendingVid;pendingVid=null;player.cueVideoById(v)}},onError:ytError}});return}
   if(ready)player.cueVideoById(vid);else pendingVid=vid}
 const vt=()=>player&&ready&&player.getCurrentTime?player.getCurrentTime():0;
 
 /* ---------- songs & search ---------- */
 function addSong(s){let ex=songs.find(x=>x.vid===s.vid);
   if(!ex){ex={vid:s.vid,title:s.title,ch:s.ch,thumb:s.thumb,phrases:[{name:'1절',a:null,b:null},{name:'후렴',a:null,b:null}]};songs.unshift(ex)}
-  cur=ex.vid;phIdx=0;viewTake=null;save();load(cur);closeDrawer();renderAll();
+  syncing=false;aligning=false;lastLine=-2;cur=ex.vid;phIdx=0;viewTake=null;save();load(cur);closeDrawer();renderAll();setTimeout(()=>autoLyrics(ex),1500);
   status('영상을 재생하다가 연습할 부분 시작에서 "A 여기부터", 끝에서 "B 여기까지"를 누르세요.')}
 function itemEl(s,lib){const b=document.createElement('div');b.className='item';b.tabIndex=0;b.setAttribute('role','button');if(lib)b.setAttribute('aria-current',s.vid===cur);
   const best=takes.filter(t=>t.vid===s.vid).reduce((a,t)=>Math.max(a,t.score),0);
@@ -336,6 +385,7 @@ async function ensureMic(){if(!navigator.mediaDevices?.getUserMedia)throw new Er
   if(!stream||!stream.active)stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:false,autoGainControl:false}});
   if(!ac)ac=new (window.AudioContext||window.webkitAudioContext)();if(ac.state!=='running')await ac.resume()}
 async function startRec(){
+  if(!micOn){status('마이크가 꺼져 있어요. 오른쪽 "🎙 마이크" 버튼을 눌러 켜 주세요.');return}
   if(!song()){status('먼저 "노래 찾기"로 노래를 골라 주세요.');openDrawer();return}
   const p=ph();if(mode==='ph'&&(p?.a==null||p?.b==null)){status('A·B 구간이 아직 없어요. 구간 없이 부르려면 녹음 버튼 아래 "자유"를 고르세요.');return}
   try{await ensureMic()}catch(e){status(e.message==='nomic'?'이 브라우저에서는 마이크를 쓸 수 없어요. Safari로 열어 주세요.':'마이크가 허용되지 않았어요. 주소창 왼쪽 메뉴 → 웹사이트 설정 → 마이크를 "허용"으로 바꿔 주세요.');return}
@@ -487,7 +537,109 @@ function drawChart(list){const cv=$('#chart');if(!cv)return;const dpr=devicePixe
   list.forEach((t,k)=>{const me=k===list.length-1;g.strokeStyle=col(me?'--pitch':'--ghost');g.globalAlpha=me?1:.7;g.lineWidth=me?2.4:1.5;g.beginPath();let pen=false;
     t.contour.forEach((m,i)=>{if(!m){pen=false;return}if(!pen){g.moveTo(X(i),Y(m));pen=true}else g.lineTo(X(i),Y(m))});g.stroke();g.globalAlpha=1})}
 
-function renderAll(){renderPhrases();renderLesson();fitVideo()}
+/* ---------- speaker / mic switches ---------- */
+let spkOn=store.get('vc.spk',true),micOn=store.get('vc.mic',true);
+function applySpk(){if(!player||!ready)return;try{spkOn?player.unMute():player.mute()}catch(e){}}
+function renderSw(){const s=$('#spkBtn'),m=$('#micBtn');s.setAttribute('aria-pressed',spkOn);s.textContent=spkOn?'🔊 반주 켬':'🔇 반주 끔';
+  m.setAttribute('aria-pressed',micOn);m.textContent=micOn?'🎙 마이크 켬':'🎙 마이크 끔';$('#recBtn').disabled=!micOn}
+$('#spkBtn').onclick=()=>{spkOn=!spkOn;store.set('vc.spk',spkOn);applySpk();renderSw();status(spkOn?'반주 소리를 켰어요.':'반주 소리를 껐어요. 영상은 그대로 흘러가서 가사와 구간은 맞춰져요. 반주 없이 불러 보는 연습에 좋아요.')};
+$('#micBtn').onclick=()=>{micOn=!micOn;store.set('vc.mic',micOn);
+  if(!micOn){if(rec)stopRec();if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}status('마이크를 껐어요. 마이크를 끄면 아이패드 반주 소리가 원래 크기로 돌아와요.')}
+  else status('마이크를 켰어요. 녹음 버튼을 누르면 녹음이 시작돼요.');renderSw()};
+
+/* ---------- lyrics window ---------- */
+// lyrics: song.lyr = {lines:[{t:sec|null,x:text}], off:sec}
+let syncing=false,syncIdx=0;
+function parseLyr(txt){const lines=[];const re=/\[(\d{1,2}):(\d{1,2}(?:\.\d{1,3})?)\]/g;
+  txt.split(/\r?\n/).forEach(raw=>{const tags=[...raw.matchAll(re)];const x=raw.replace(re,'').trim();
+    if(tags.length){tags.forEach(m=>{if(x)lines.push({t:(+m[1])*60+(+m[2]),x})})}else if(x)lines.push({t:null,x})});
+  if(lines.some(l=>l.t!=null))lines.sort((a,b)=>(a.t??1e9)-(b.t??1e9));return lines}
+const lyr=()=>song()?.lyr;
+const timed=L=>L&&L.lines.length&&L.lines.every(l=>l.t!=null);
+function renderLyr(){const L=lyr(),box=$('#lyr');box.classList.toggle('sync',syncing);
+  $('#lyrSlow').hidden=$('#lyrFast').hidden=$('#lyrAlign').hidden=!(timed(L)&&!syncing&&!aligning);
+  const ctl=$('#lyrCtl');
+  if(syncing){$('#lyrEdit').textContent='싱크 끝내기';
+    if(!$('#tapBtn')){const b=document.createElement('button');b.id='tapBtn';b.className='tapbtn';b.textContent='👆 이 줄 시작!';b.onclick=tapSync;ctl.prepend(b);
+      const u=document.createElement('button');u.id='undoBtn';u.textContent='↶ 한 줄 뒤로';u.onclick=()=>{if(syncIdx>0){syncIdx--;L.lines[syncIdx].t=null;showLines(syncIdx-1,syncIdx);}};ctl.prepend(u)}}
+  else{$('#tapBtn')?.remove();$('#undoBtn')?.remove();$('#lyrEdit').textContent=L&&L.lines.length?'가사 고치기':'가사 넣기'}
+  if(!song()){showText('가사창','노래를 고르면 가사를 넣을 수 있어요');return}
+  if(!L||!L.lines.length){showText('가사창','가사가 안 나오는 영상이면 "가사 넣기"로 붙여넣으세요');return}
+  if(syncing){showLines(syncIdx-1,syncIdx);return}
+  if(!timed(L)){showText(L.lines[0].x,'가사 싱크가 아직 없어요. "가사 고치기" → "저장하고 싱크 맞추기"를 눌러 주세요');return}
+  tickLyr(true)}
+function showText(a,b){$('#l1').textContent=a;$('#l2').textContent=b}
+function showLines(i,j){const L=lyr();const a=L.lines[i],b=L.lines[j];
+  if(syncing){showText(a?a.x:'영상을 재생하고, 첫 줄이 시작될 때 "이 줄 시작!"을 누르세요',b?'다음: '+b.x:'마지막 줄까지 다 맞췄어요. "싱크 끝내기"를 누르세요');return}
+  showText(a?a.x:'♪',b?b.x:'')}
+let lastLine=-2;
+function tickLyr(force){const L=lyr();if(syncing||aligning||!timed(L))return;const t=vt()+(L.off||0);
+  let i=-1;for(let k=0;k<L.lines.length;k++){if(L.lines[k].t<=t)i=k;else break}
+  if(i!==lastLine||force){lastLine=i;if(i<0)showText('♪ '+L.lines[0].x,'곧 시작해요');else showLines(i,i+1)}}
+setInterval(()=>tickLyr(false),150);
+function tapSync(){const L=lyr();if(!L||syncIdx>=L.lines.length)return;
+  if(!ready||player.getPlayerState()!==1){status('먼저 영상을 재생해 주세요. 재생 중에 줄이 시작될 때마다 누르면 돼요.');return}
+  L.lines[syncIdx].t=Math.max(0,vt()-0.25);syncIdx++;save();showLines(syncIdx-1,syncIdx);
+  if(syncIdx>=L.lines.length)endSync()}
+function startSync(){const L=lyr();if(!L||!L.lines.length)return;syncing=true;syncIdx=0;L.lines.forEach(l=>l.t=null);L.off=0;save();renderLyr();
+  if(ready){player.seekTo(0,true);player.playVideo()}
+  status('가사 싱크 모드예요. 노래를 들으며 각 줄이 시작될 때마다 노란 "이 줄 시작!" 버튼을 누르세요. 틀리면 "한 줄 뒤로".')}
+function endSync(){const L=lyr();syncing=false;
+  if(L){const last=L.lines.filter(l=>l.t!=null).pop();L.lines.forEach((l,k)=>{if(l.t==null)l.t=(last?last.t:0)+3*(k+1)})}
+  save();lastLine=-2;renderLyr();status('가사 싱크를 저장했어요. 가사가 노래보다 빠르거나 느리면 가사창의 "◀ 늦게"·"빠르게 ▶"로 맞추세요.')}
+$('#lyrEdit').onclick=()=>{if(syncing){endSync();return}if(!song()){status('먼저 노래를 골라 주세요.');return}
+  const L=lyr();$('#lyrTx').value=L?L.lines.map(l=>(l.t!=null?'['+String(Math.floor(l.t/60)).padStart(2,'0')+':'+(l.t%60).toFixed(2).padStart(5,'0')+']':'')+l.x).join('\n'):'';$('#lq').value=cleanTitle(song().title);$('#lres').textContent='';$('#lyrDlg').showModal();if(!L&&$('#lq').value)$('#lqForm').requestSubmit()};
+function saveLyrFromDlg(){const s=song();const lines=parseLyr($('#lyrTx').value);s.lyr=lines.length?{lines,off:0}:null;save();$('#lyrDlg').close();lastLine=-2;return lines}
+$('#lyrCancel').onclick=()=>$('#lyrDlg').close();
+$('#lyrSave').onclick=()=>{const l=saveLyrFromDlg();renderLyr();if(l.length&&!timed(lyr()))status('가사를 저장했어요. 노래에 맞춰 흐르게 하려면 "가사 고치기" → "저장하고 싱크 맞추기"를 눌러 주세요.')};
+$('#lyrSync').onclick=()=>{const l=saveLyrFromDlg();if(!l.length){renderLyr();return}if(timed(lyr())){renderLyr();status('시간이 적힌 가사라 싱크가 자동으로 맞춰졌어요.')}else startSync()};
+$('#lyrSlow').onclick=()=>{const L=lyr();L.off=Math.round(((L.off||0)-0.3)*10)/10;save();tickLyr(true);status('가사를 0.3초 늦췄어요 (지금 '+(L.off>0?'+':'')+L.off+'초).')};
+$('#lyrFast').onclick=()=>{const L=lyr();L.off=Math.round(((L.off||0)+0.3)*10)/10;save();tickLyr(true);status('가사를 0.3초 앞당겼어요 (지금 '+(L.off>0?'+':'')+L.off+'초).')};
+
+/* ---------- lyrics search (LRCLIB, free public lyrics database) ---------- */
+let aligning=false;
+function cleanTitle(t){t=String(t||'');
+  t=t.replace(/[\[(【<][^\])】>]*(mr|반주|노래방|inst|key|키|karaoke|가사|lyrics|official|audio|m\/v|mv|음원|ver|버전|cover|커버)[^\])】>]*[\])】>]/gi,' ');
+  t=t.replace(/[\[\]()【】<>#|_/~"'「」『』]/g,' ').replace(/\b(mr|inst\.?|instrumental|karaoke|lyrics|official|audio|m\/v|mv|ver\.?|cover)\b/gi,' ')
+   .replace(/(노래방|반주곡|반주|가사|남자키|여자키|원키|[+-]?\d+\s*key|남\s*[+-]?\d+|여\s*[+-]?\d+|실제\s*음원|음원|커버|TJ|금영)/gi,' ').replace(/[-–:]+/g,' ');
+  return t.replace(/(^|\s)[.,!?·]+(?=\s|$)/g,' ').replace(/\s+/g,' ').trim()}
+async function lyrSearch(q){const r=await tfetch('https://lrclib.net/api/search?q='+encodeURIComponent(q),9000);if(!r.ok)throw new Error('lrclib '+r.status);const j=await r.json();
+  const dur=ready&&player.getDuration?player.getDuration():0;
+  return (Array.isArray(j)?j:[]).filter(x=>!x.instrumental&&(x.syncedLyrics||x.plainLyrics)).map(x=>({...x,_s:(x.syncedLyrics?2:0)+(dur&&x.duration?Math.max(0,1-Math.abs(dur-x.duration)/40):0)})).sort((a,b)=>b._s-a._s)}
+function renderLres(list){const box=$('#lres');box.textContent='';
+  if(!list.length){box.innerHTML='<p class="hint">가사를 찾지 못했어요. 곡명만 또는 "가수 곡명"으로 다시 검색하거나 직접 붙여넣어 주세요.</p>';return}
+  list.slice(0,10).forEach(x=>{const b=document.createElement('button');b.type='button';b.className='lit';
+    b.innerHTML='<div style="min-width:0"><b>'+esc(x.trackName)+'</b><span>'+esc(x.artistName||'')+(x.duration?' · '+fmt(x.duration):'')+'</span></div><em class="'+(x.syncedLyrics?'good':'warn')+'">'+(x.syncedLyrics?'자동 싱크':'가사만')+'</em>';
+    b.onclick=()=>{$('#lyrTx').value=x.syncedLyrics||x.plainLyrics;$('#lyrTx').scrollTop=0;
+      box.querySelectorAll('.lit').forEach(e=>e.style.borderColor='');b.style.borderColor='var(--accent)';
+      status(x.syncedLyrics?'시간 정보가 있는 가사예요. "저장"을 누르면 노래에 맞춰 흘러가요.':'시간 정보가 없는 가사예요. "저장하고 싱크 맞추기"로 직접 맞춰 주세요.')};
+    box.appendChild(b)})}
+$('#lqForm').addEventListener('submit',async e=>{e.preventDefault();const q=$('#lq').value.trim();if(!q)return;$('#lres').innerHTML='<p class="hint">가사를 찾는 중…</p>';
+  try{renderLres(await lyrSearch(q))}catch(err){$('#lres').innerHTML='<p class="hint">가사 검색 서버에 연결하지 못했어요. 잠시 뒤 다시 시도하거나 직접 붙여넣어 주세요.</p>'}});
+// auto: when a song without lyrics is opened, look for synced lyrics
+async function autoLyrics(s){if(!s||s.lyr||s.lyrTried)return;s.lyrTried=true;save();
+  const q=cleanTitle(s.title);if(!q)return;
+  try{let list=await lyrSearch(q);if(!list.length&&q.split(' ').length>2)list=await lyrSearch(q.split(' ').slice(0,3).join(' '));
+    const best=list.find(x=>x.syncedLyrics)||list[0];if(!best||song()!==s)return;
+    const lines=parseLyr(best.syncedLyrics||best.plainLyrics);if(!lines.length)return;
+    s.lyr={lines,off:0,src:best.artistName+' - '+best.trackName};save();lastLine=-2;renderLyr();
+    status('가사를 자동으로 넣었어요 ('+best.artistName+' - '+best.trackName+'). '+(timed(s.lyr)?'반주 영상은 원곡과 시작 시간이 달라요. 가사창의 "첫 줄 맞추기"를 한 번 해 주세요.':'노래에 맞춰 흐르게 하려면 "가사 고치기" → "저장하고 싱크 맞추기"를 눌러 주세요.'))}
+  catch(e){}}
+// one tap to line up the first line with this video
+$('#lyrAlign').onclick=()=>{const L=lyr();if(!timed(L))return;aligning=true;renderLyr();
+  showText(L.lines[0].x,'노래를 틀고, 이 첫 줄을 부르기 시작하는 순간 노란 버튼을 누르세요');
+  const b=document.createElement('button');b.id='alignTap';b.className='tapbtn';b.textContent='👆 지금 첫 줄!';
+  b.onclick=()=>{if(!ready||player.getPlayerState()!==1){status('먼저 영상을 재생해 주세요.');return}
+    L.off=Math.round((L.lines[0].t-vt()+0.2)*10)/10;aligning=false;b.remove();cx.remove();save();lastLine=-2;renderLyr();status('첫 줄을 맞췄어요. 이제 가사가 노래에 맞춰 흘러가요. 조금 어긋나면 "◀ 늦게"·"빠르게 ▶"로 다듬으세요.')};
+  const cx=document.createElement('button');cx.textContent='취소';cx.onclick=()=>{aligning=false;b.remove();cx.remove();lastLine=-2;renderLyr()};
+  $('#lyrCtl').prepend(cx);$('#lyrCtl').prepend(b);
+  if(ready){player.seekTo(0,true);player.playVideo()}};
+
+/* ---------- home screen ---------- */
+if(!navigator.standalone&&!matchMedia('(display-mode: standalone)').matches)$('#homeBtn').hidden=false;
+$('#homeBtn').onclick=()=>$('#homeDlg').showModal();$('#homeClose').onclick=()=>$('#homeDlg').close();
+
+function renderAll(){renderPhrases();renderLesson();renderSw();if(!syncing)renderLyr();fitVideo()}
 renderAll();if(cur&&song())load(cur);
 requestAnimationFrame(fitVideo);
 })();
