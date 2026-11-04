@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>발라드 보컬 코치</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700;800&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one-screen dashboard — left stage (video, phrase A–B bar, record + live pitch), right coach column (search/library tabs, lesson, take comparison) */
+:root{
+  --bg:#0E131A; --surface:#161E28; --raise:#1D2733; --ink:#E7EBF2; --muted:#9AA4B5; --line:#283241;
+  --accent:#4FB8BC; --accent-ink:#0B1A1B; --pitch:#F0A93A; --ghost:#5E6A7C; --soft:#1A2B31;
+  --rec:#EF5A50; --good:#5CC48A; --warn:#E8A647; --bad:#E57373;
+  --display:"Nanum Myeongjo","AppleMyungjo",serif;
+  --body:"IBM Plex Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;
+  padding:max(12px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));-webkit-text-size-adjust:100%}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.top h1{font-family:var(--display);font-weight:800;font-size:22px;margin:0}
+.top .sp{flex:1}
+.grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:12px;min-width:0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+h2{font-family:var(--display);font-size:17px;margin:0}
+h3{font-size:14px;margin:0}
+.hint{font-size:13px;color:var(--muted);margin:0}
+.label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+button,.btn{font:inherit;font-weight:600;border-radius:10px;border:1px solid var(--line);background:var(--raise);color:var(--ink);padding:8px 13px;cursor:pointer;
+  min-height:42px;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;-webkit-tap-highlight-color:transparent}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button:disabled{opacity:.45}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px;width:100%;min-height:42px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.grow{flex:1 1 140px;min-width:0}
+
+.video{position:relative;aspect-ratio:16/9;max-width:100%;border-radius:10px;overflow:hidden;background:#000}
+.video>div,.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.video .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--muted);text-align:center;padding:16px;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 24px),linear-gradient(160deg,#1E2E3A,#0B1117)}
+.now b{font-size:16px}
+.ab{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.ab .t{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:13px;color:var(--muted)}
+.phrases{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+.ph{flex:0 0 auto;border-radius:999px;min-height:36px;padding:6px 13px;font-size:14px;background:var(--bg)}
+.ph[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.ph small{font-family:var(--mono);opacity:.75;margin-left:4px;font-weight:500}
+
+.recbox{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center}
+.recbtn{width:84px;height:84px;border-radius:50%;background:var(--rec);border:4px solid #fff3;color:#fff;font-size:13px;flex-direction:column;gap:2px;padding:0}
+.recbtn .ic{width:22px;height:22px;border-radius:50%;background:#fff}
+.recbtn.on .ic{border-radius:4px}
+.recbtn.on{animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 10px #EF5A5033}}
+@media (prefers-reduced-motion:reduce){.recbtn.on{animation:none}}
+.live{display:flex;flex-direction:column;gap:4px;min-width:0}
+.live .note{font-family:var(--display);font-size:28px;font-weight:800;line-height:1}
+.live .note small{font-family:var(--mono);font-size:13px;color:var(--muted);font-weight:500;margin-left:6px}
+#liveCv{width:100%;height:90px;display:block;background:var(--bg);border-radius:8px;border:1px solid var(--line)}
+.modes{display:flex;gap:6px}
+.modes button{flex:1;font-size:13px;min-height:36px}
+.modes button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+
+.tabs{display:flex;gap:4px;background:var(--bg);border-radius:10px;padding:3px}
+.tabs button{flex:1;min-height:36px;border:none;background:none;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--raise);color:var(--ink)}
+.list{display:flex;flex-direction:column;gap:6px;max-height:320px;overflow:auto;-webkit-overflow-scrolling:touch}
+.item{display:flex;gap:10px;align-items:center;padding:6px;border-radius:10px;border:1px solid var(--line);background:var(--bg);cursor:pointer;text-align:left;width:100%;min-height:58px;font-weight:500}
+.item[aria-current="true"]{border-color:var(--accent);background:var(--soft)}
+.item img{width:80px;aspect-ratio:16/9;object-fit:cover;border-radius:6px;flex:0 0 auto;background:#000}
+.item .tx{flex:1;min-width:0}
+.item .tx b{display:block;font-size:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.item .tx span{font-size:12px;color:var(--muted)}
+.item .x{min-height:32px;padding:2px 9px;font-size:12px}
+
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+@media (max-width:520px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.k{border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--bg);min-width:0;display:flex;flex-direction:column}
+.k .t{font-size:11px;color:var(--muted)}
+.k .v{font-family:var(--mono);font-size:17px;font-variant-numeric:tabular-nums}
+.k .d{font-size:11px;font-weight:600}
+.k.big .v{font-family:var(--display);font-size:28px;font-weight:800;line-height:1.1}
+.good{color:var(--good)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+#chart{width:100%;height:170px;display:block;background:var(--bg);border-radius:10px;border:1px solid var(--line)}
+.legend{display:flex;gap:12px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:4px}
+.lesson{border-left:3px solid var(--accent);padding-left:12px;font-size:15px}
+.lesson h4{font-family:var(--display);font-size:15px;margin:8px 0 2px}
+.lesson ul{margin:2px 0;padding-left:18px}
+.lesson p{margin:2px 0}
+.takes{display:flex;flex-direction:column}
+.take{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px;font-variant-numeric:tabular-nums}
+.take .n{font-family:var(--mono);color:var(--muted);width:34px}
+.take .s{font-weight:600;width:48px}
+.take .m{flex:1;min-width:0;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.take button{min-height:32px;padding:2px 9px;font-size:12px}
+dialog{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:14px;max-width:min(520px,92vw);padding:18px}
+dialog::backdrop{background:#000a}
+dialog label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
+.banner{background:var(--soft);border:1px solid var(--accent);border-radius:10px;padding:10px 12px;font-size:13px}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>발라드 보컬 코치</h1><span class="sp"></span>
+  <button id="setBtn">설정</button>
+</header>
+
+<main class="grid">
+  <div class="col">
+    <section class="panel">
+      <div class="video" id="videoBox"><div class="empty" id="videoEmpty"><b>오른쪽에서 노래를 검색하거나 유튜브 링크를 붙여넣으세요</b><span class="hint">영상이 여기서 바로 재생돼요</span></div><div id="yt"></div></div>
+      <div class="row now"><div class="grow"><b id="nowTitle">곡 없음</b><div class="hint" id="nowCh"></div></div></div>
+      <div class="phrases" id="phrases" role="group" aria-label="구절"></div>
+      <div class="ab">
+        <button id="setA">A 시작점 ⟵ 지금</button><span class="t" id="aT">A --:--</span>
+        <button id="setB">B 끝점 ⟵ 지금</button><span class="t" id="bT">B --:--</span>
+        <button id="playAB">▶ 구절 듣기</button><button id="addPh">+ 구절</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="modes" role="group" aria-label="녹음 방식">
+        <button id="mPh" aria-pressed="true">구절 녹음 (A→B 자동 멈춤)</button>
+        <button id="mFree" aria-pressed="false">자유 녹음</button>
+      </div>
+      <div class="recbox">
+        <button class="recbtn" id="recBtn" aria-label="녹음 시작"><span class="ic"></span><span id="recTx">시작</span></button>
+        <div class="live">
+          <div class="note" id="liveNote">--<small id="liveSub">녹음을 시작하면 실시간 음정이 보여요</small></div>
+          <canvas id="liveCv"></canvas>
+        </div>
+      </div>
+      <p class="hint" id="status">이어폰(에어팟 등)을 끼고 시작을 누르세요. 영상이 재생되며 동시에 녹음되고, 멈추면 바로 분석·레슨이 나와요.</p>
+    </section>
+  </div>
+
+  <div class="col">
+    <section class="panel">
+      <div class="tabs" role="tablist">
+        <button role="tab" id="tSearch" aria-selected="true">노래 검색</button>
+        <button role="tab" id="tLib" aria-selected="false">내 연습곡</button>
+      </div>
+      <div id="pSearch" class="col">
+        <form id="sForm" class="row"><input id="q" class="grow" placeholder="곡명 또는 가수 (예: 성시경 거리에서)" enterkeyhint="search" autocomplete="off"><button class="primary" type="submit">검색</button></form>
+        <div class="row"><input id="link" class="grow" placeholder="또는 유튜브 링크 붙여넣기" autocomplete="off"><button id="linkBtn">열기</button></div>
+        <label class="row hint" style="gap:6px"><input type="checkbox" id="mrOnly" checked style="width:auto;min-height:0"> 노래방(MR) 영상 위주로 찾기</label>
+        <div class="list" id="results"></div>
+      </div>
+      <div id="pLib" class="col" hidden><div class="list" id="lib"></div></div>
+    </section>
+
+    <section class="panel">
+      <div class="row"><h2 class="grow">바로 레슨</h2><span class="hint" id="lessonSrc"></span></div>
+      <div class="lesson" id="lesson"><p class="hint">구절을 녹음하면 여기에 레슨이 나와요. 같은 구절을 다시 부르면 이전 테이크와 비교해 드려요.</p></div>
+      <div class="kpis" id="kpis"></div>
+      <canvas id="chart"></canvas>
+      <div class="legend"><span><i style="background:var(--pitch)"></i>이번 테이크</span><span><i style="background:var(--ghost)"></i>이전 테이크</span><span>가로줄: 반음</span></div>
+      <audio id="player" controls hidden style="width:100%"></audio>
+      <h3>이 구절 테이크</h3>
+      <div class="takes" id="takes"></div>
+    </section>
+  </div>
+</main>
+
+<dialog id="dlg">
+  <h2>설정</h2>
+  <label for="ytKey">유튜브 검색 키 (YouTube Data API v3)</label>
+  <input id="ytKey" placeholder="AIza…" autocomplete="off">
+  <p class="hint">있으면 이 화면에서 바로 노래를 검색할 수 있어요. 없으면 링크 붙여넣기로 곡을 추가합니다.</p>
+  <label for="aiKey">Claude 레슨 키 (선택, Anthropic API)</label>
+  <input id="aiKey" placeholder="sk-ant-…" autocomplete="off">
+  <p class="hint">넣으면 Claude가 레슨을 써요. 비워 두면 프로그램 내장 레슨이 나와요. 키는 이 기기 브라우저에만 저장됩니다. API 사용료는 Claude 구독과 별도로 청구돼요.</p>
+  <div class="row" style="margin-top:14px;justify-content:flex-end"><button id="dlgClose" class="primary">저장</button></div>
+</dialog>
+
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+(()=>{
+const $=s=>document.querySelector(s);
+const NOTE=['도','도#','레','레#','미','파','파#','솔','솔#','라','라#','시'],EN=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const nn=m=>{const r=Math.round(m),p=(r%12+12)%12;return NOTE[p]+'('+EN[p]+Math.floor(r/12-1)+')'};
+const fmt=t=>t==null?'--:--':Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const unesc=s=>{const t=document.createElement('textarea');t.innerHTML=s;return t.value};
+
+let cfg=store.get('vc.cfg',{yt:'',ai:''});
+let songs=store.get('vc.songs',[]); // {vid,title,ch,thumb,phrases:[{name,a,b}]}
+let cur=store.get('vc.cur',null),phIdx=0;
+let takes=store.get('vc.takes',[]);
+const blobs={};
+const save=()=>{store.set('vc.songs',songs);store.set('vc.cur',cur);store.set('vc.takes',takes)};
+const song=()=>songs.find(s=>s.vid===cur);
+const ph=()=>song()?.phrases[phIdx];
+const phTakes=()=>takes.filter(t=>t.vid===cur&&t.ph===ph()?.name);
+
+/* ---------- settings ---------- */
+$('#setBtn').onclick=()=>{$('#ytKey').value=cfg.yt;$('#aiKey').value=cfg.ai;$('#dlg').showModal()};
+$('#dlgClose').onclick=()=>{cfg={yt:$('#ytKey').value.trim(),ai:$('#aiKey').value.trim()};store.set('vc.cfg',cfg);$('#dlg').close();renderResultsHint()};
+
+/* ---------- YouTube player ---------- */
+let player=null,ready=false,pendingVid=null;
+window.onYouTubeIframeAPIReady=()=>{
+  player=new YT.Player('yt',{width:'100%',height:'100%',playerVars:{playsinline:1,rel:0,modestbranding:1},
+    events:{onReady:()=>{ready=true;if(pendingVid)load(pendingVid)},onError:e=>{status((e.data===101||e.data===150)?'이 영상은 다른 사이트에서 재생이 막혀 있어요. 같은 곡의 다른 영상(노래방 채널 등)을 골라 주세요.':'영상을 불러오지 못했어요. 다른 영상을 선택해 주세요.')}}});
+};
+function load(vid){if(!ready){pendingVid=vid;return}$('#videoEmpty').hidden=true;player.cueVideoById(vid)}
+const vt=()=>player&&ready&&player.getCurrentTime?player.getCurrentTime():0;
+
+/* ---------- songs ---------- */
+function addSong(s){let ex=songs.find(x=>x.vid===s.vid);if(!ex){ex={...s,phrases:[{name:'1절',a:null,b:null},{name:'후렴',a:null,b:null}]};songs.unshift(ex)}
+  cur=ex.vid;phIdx=0;save();load(cur);renderAll();status('곡을 불러왔어요. 영상을 재생하며 구절의 A·B 지점을 정해 보세요.')}
+function itemEl(s,lib){
+  const b=document.createElement('div');b.className='item';b.tabIndex=0;b.setAttribute('role','button');if(lib)b.setAttribute('aria-current',s.vid===cur);
+  const best=takes.filter(t=>t.vid===s.vid).reduce((a,t)=>Math.max(a,t.score),0);
+  b.innerHTML=`<img alt="" src="${esc(s.thumb||'https://i.ytimg.com/vi/'+s.vid+'/mqdefault.jpg')}"><div class="tx"><b>${esc(s.title)}</b><span>${esc(s.ch||'')}${best?' · 최고 '+best+'점':''}</span></div>`;
+  const go=()=>addSong(s);b.addEventListener('click',e=>{if(!e.target.closest('.x'))go()});b.addEventListener('keydown',e=>{if(e.key==='Enter')go()});
+  if(lib){const x=document.createElement('button');x.className='x';x.textContent='삭제';x.onclick=()=>{songs=songs.filter(v=>v.vid!==s.vid);if(cur===s.vid)cur=null;save();renderAll()};b.appendChild(x)}
+  return b;
+}
+function renderLib(){const box=$('#lib');box.textContent='';if(!songs.length)box.innerHTML='<p class="hint">아직 연습곡이 없어요. 노래 검색에서 곡을 고르면 여기에 저장돼요.</p>';songs.forEach(s=>box.appendChild(itemEl(s,true)))}
+function renderResultsHint(){if($('#results').childElementCount)return;
+  $('#results').innerHTML=cfg.yt?'<p class="hint">곡명이나 가수를 검색하세요.</p>':'<p class="banner">바로 검색하려면 <b>설정</b>에 유튜브 검색 키를 넣어 주세요. 키가 없을 때는 유튜브에서 곡을 찾아 <b>공유 → 링크 복사</b> 후 위 칸에 붙여넣으면 됩니다.</p>'}
+$('#sForm').addEventListener('submit',async e=>{e.preventDefault();const q=$('#q').value.trim();if(!q)return;$('#q').blur();
+  const box=$('#results');
+  if(!cfg.yt){box.innerHTML='<p class="banner">검색 키가 없어 이 화면에서 검색할 수 없어요. <b>설정</b>에 키를 넣거나, <a style="color:var(--accent)" target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query='+encodeURIComponent(q+($('#mrOnly').checked?' 노래방':''))+'">유튜브에서 찾아</a> 링크를 복사해 붙여넣으세요.</p>';return}
+  box.innerHTML='<p class="hint">검색 중…</p>';
+  try{const u='https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoEmbeddable=true&maxResults=10&regionCode=KR&q='+encodeURIComponent(q+($('#mrOnly').checked?' 노래방 MR':''))+'&key='+encodeURIComponent(cfg.yt);
+    const r=await fetch(u);const j=await r.json();if(!r.ok)throw new Error(j.error?.message||r.status);
+    box.textContent='';(j.items||[]).forEach(it=>box.appendChild(itemEl({vid:it.id.videoId,title:unesc(it.snippet.title),ch:unesc(it.snippet.channelTitle),thumb:it.snippet.thumbnails?.medium?.url},false)));
+    if(!box.childElementCount)box.innerHTML='<p class="hint">결과가 없어요. 다른 검색어로 찾아보세요.</p>'}
+  catch(err){box.innerHTML='<p class="banner">검색하지 못했어요. 설정의 유튜브 검색 키를 확인해 주세요. ('+esc(err.message)+')</p>'}});
+function parseVid(s){s=s.trim();const m=s.match(/(?:v=|youtu\.be\/|shorts\/|embed\/|live\/)([\w-]{11})/);return m?m[1]:(/^[\w-]{11}$/.test(s)?s:null)}
+$('#linkBtn').onclick=async()=>{const vid=parseVid($('#link').value);if(!vid){status('유튜브 링크를 인식하지 못했어요. 공유 → 링크 복사로 받은 주소를 붙여넣어 주세요.');return}
+  let title='유튜브 영상',ch='';try{const r=await fetch('https://www.youtube.com/oembed?format=json&url='+encodeURIComponent('https://www.youtube.com/watch?v='+vid));if(r.ok){const j=await r.json();title=j.title;ch=j.author_name}}catch(e){}
+  $('#link').value='';addSong({vid,title,ch})};
+['tSearch','tLib'].forEach(id=>$('#'+id).onclick=()=>{const s=id==='tSearch';$('#tSearch').setAttribute('aria-selected',s);$('#tLib').setAttribute('aria-selected',!s);$('#pSearch').hidden=!s;$('#pLib').hidden=s});
+
+/* ---------- phrases ---------- */
+function renderPhrases(){const s=song(),box=$('#phrases');box.textContent='';
+  $('#nowTitle').textContent=s?s.title:'곡 없음';$('#nowCh').textContent=s?s.ch:'';
+  if(!s)return;s.phrases.forEach((p,i)=>{const b=document.createElement('button');b.className='ph';b.setAttribute('aria-pressed',i===phIdx);
+    const n=takes.filter(t=>t.vid===cur&&t.ph===p.name).length;b.innerHTML=esc(p.name)+(n?'<small>×'+n+'</small>':'');b.onclick=()=>{phIdx=i;renderAll()};box.appendChild(b)});
+  const p=ph();$('#aT').textContent='A '+fmt(p?.a);$('#bT').textContent='B '+fmt(p?.b)}
+$('#setA').onclick=()=>{const p=ph();if(!p)return;p.a=Math.max(0,vt());if(p.b!=null&&p.b<=p.a)p.b=null;save();renderPhrases()};
+$('#setB').onclick=()=>{const p=ph();if(!p)return;const t=vt();if(p.a!=null&&t<=p.a){status('B는 A보다 뒤여야 해요.');return}p.b=t;save();renderPhrases()};
+$('#addPh').onclick=()=>{const s=song();if(!s)return;let n=s.phrases.length+1;while(s.phrases.some(p=>p.name==='구절 '+n))n++;s.phrases.push({name:'구절 '+n,a:null,b:null});phIdx=s.phrases.length-1;save();renderAll()};
+let abTimer=null;
+function playFrom(a,b,onEnd){if(!ready||!song())return;clearInterval(abTimer);player.seekTo(a||0,true);player.playVideo();
+  if(b!=null)abTimer=setInterval(()=>{if(vt()>=b){clearInterval(abTimer);player.pauseVideo();onEnd&&onEnd()}},100)}
+$('#playAB').onclick=()=>{const p=ph();if(!p||p.a==null){status('먼저 A 시작점을 정해 주세요. 영상을 원하는 위치에 두고 "A 시작점"을 누르면 돼요.');return}playFrom(p.a,p.b)};
+
+/* ---------- recording ---------- */
+let mode='ph',rec=null;
+$('#mPh').onclick=()=>{mode='ph';$('#mPh').setAttribute('aria-pressed',true);$('#mFree').setAttribute('aria-pressed',false)};
+$('#mFree').onclick=()=>{mode='free';$('#mPh').setAttribute('aria-pressed',false);$('#mFree').setAttribute('aria-pressed',true)};
+function status(t){$('#status').textContent=t}
+let stream=null,ac=null;
+async function ensureMic(){
+  if(!navigator.mediaDevices?.getUserMedia)throw new Error('nomic');
+  if(!stream||!stream.active)stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:false,autoGainControl:false}});
+  if(!ac){ac=new (window.AudioContext||window.webkitAudioContext)()}if(ac.state!=='running')await ac.resume();
+}
+async function startRec(){
+  if(!song()){status('먼저 오른쪽에서 노래를 선택해 주세요.');return}
+  const p=ph();if(mode==='ph'&&(p?.a==null||p?.b==null)){status('구절 녹음은 A·B 지점이 필요해요. 정하지 않으려면 "자유 녹음"을 쓰세요.');return}
+  try{await ensureMic()}catch(e){status(e.message==='nomic'?'이 브라우저에서는 마이크를 쓸 수 없어요. Safari로 https 주소에서 열어 주세요.':'마이크 사용이 허용되지 않았어요. Safari 주소창의 "가가" 메뉴 → 웹사이트 설정 → 마이크를 "허용"으로 바꿔 주세요.');return}
+  const src=ac.createMediaStreamSource(stream),proc=ac.createScriptProcessor(4096,1,1),mute=ac.createGain();mute.gain.value=0;
+  rec={chunks:[],rate:ac.sampleRate,src,proc,mute,live:[],t0:performance.now()};
+  proc.onaudioprocess=e=>{const d=e.inputBuffer.getChannelData(0);rec.chunks.push(new Float32Array(d));livePitch(d,rec.rate)};
+  src.connect(proc);proc.connect(mute);mute.connect(ac.destination);
+  $('#recBtn').classList.add('on');$('#recTx').textContent='멈춤';$('#recBtn').setAttribute('aria-label','녹음 멈춤');
+  status(mode==='ph'?ph().name+' 녹음 중… B 지점에서 자동으로 멈춰요.':'녹음 중… 다 부르면 멈춤을 누르세요.');
+  if(mode==='ph')playFrom(p.a,p.b,()=>stopRec());else if(ready)player.playVideo();
+}
+function stopRec(){
+  if(!rec)return;const r=rec;rec=null;clearInterval(abTimer);
+  try{r.src.disconnect();r.proc.disconnect();r.mute.disconnect()}catch(e){}
+  if(ready&&mode==='free')player.pauseVideo();
+  $('#recBtn').classList.remove('on');$('#recTx').textContent='시작';$('#recBtn').setAttribute('aria-label','녹음 시작');
+  $('#liveSub').textContent='분석 중…';
+  const len=r.chunks.reduce((a,c)=>a+c.length,0),pcm=new Float32Array(len);let o=0;r.chunks.forEach(c=>{pcm.set(c,o);o+=c.length});
+  analyzeTake(pcm,r.rate);
+}
+$('#recBtn').onclick=()=>rec?stopRec():startRec();
+
+/* ---------- pitch ---------- */
+const SR=16000,WIN=800,HOP=320,FPS=SR/HOP;
+function yin(x,o,minL,maxL,d){let run=0;for(let t=minL;t<=maxL;t++){let s=0;for(let i=0;i<WIN-maxL;i++){const v=x[o+i]-x[o+i+t];s+=v*v}run+=s;d[t]=s*(t-minL+1)/(run||1)}
+  for(let t=minL+1;t<maxL;t++){if(d[t]<0.15){while(t+1<maxL&&d[t+1]<d[t])t++;const a=d[t-1],b=d[t],c=d[t+1],den=a-2*b+c;return SR/(t+(den?0.5*(a-c)/den:0))}}return 0}
+const MINL=Math.floor(SR/900),MAXL=Math.ceil(SR/75),dbuf=new Float32Array(MAXL+2);
+function down(x,rate){const f=rate/SR,n=Math.floor(x.length/f),y=new Float32Array(n);for(let i=0;i<n;i++){const a=Math.floor(i*f),b=Math.floor((i+1)*f);let s=0;for(let k=a;k<b;k++)s+=x[k];y[i]=s/Math.max(1,b-a)}return y}
+let liveHist=[];
+function livePitch(d,rate){const y=down(d,rate);if(y.length<WIN)return;let e=0;for(let i=0;i<WIN;i++)e+=y[i]*y[i];const rms=Math.sqrt(e/WIN);
+  let m=0;if(rms>0.008){const hz=yin(y,y.length-WIN,MINL,MAXL,dbuf);if(hz)m=69+12*Math.log2(hz/440)}
+  liveHist.push(m);if(liveHist.length>120)liveHist.shift();
+  if(m){$('#liveNote').firstChild.textContent=NOTE[(Math.round(m)%12+12)%12]+' ';const c=Math.round((m-Math.round(m))*100);$('#liveSub').textContent=nn(m)+' · '+(c>0?'+':'')+c+'c'}
+  drawLive()}
+function drawLive(){const cv=$('#liveCv'),dpr=devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;if(cv.width!==w*dpr){cv.width=w*dpr;cv.height=h*dpr}
+  const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);const v=liveHist.filter(Boolean);if(!v.length)return;
+  const mid=Math.round(v.slice(-30).reduce((a,b)=>a+b,0)/Math.min(30,v.length)),lo=mid-6,hi=mid+6,Y=m=>h*(1-(m-lo)/(hi-lo));
+  const cs=getComputedStyle(document.documentElement);g.strokeStyle=cs.getPropertyValue('--line');g.font='10px IBM Plex Mono, monospace';g.fillStyle=cs.getPropertyValue('--muted');
+  for(let m=lo;m<=hi;m++){g.beginPath();g.moveTo(26,Y(m));g.lineTo(w,Y(m));g.stroke();const p=(m%12+12)%12;if([0,2,4,5,7,9,11].includes(p))g.fillText(NOTE[p],3,Y(m)+3)}
+  g.strokeStyle=cs.getPropertyValue('--pitch');g.lineWidth=2.5;g.beginPath();let pen=false;
+  liveHist.forEach((m,i)=>{const x=26+(w-26)*i/119;if(!m||m<lo-1||m>hi+1){pen=false;return}if(!pen){g.moveTo(x,Y(m));pen=true}else g.lineTo(x,Y(m))});g.stroke()}
+
+async function resample(pcm,rate){if(rate===SR)return pcm;const off=new OfflineAudioContext(1,Math.ceil(pcm.length*SR/rate),SR);const b=off.createBuffer(1,pcm.length,rate);b.copyToChannel?b.copyToChannel(pcm,0):b.getChannelData(0).set(pcm);
+  const s=off.createBufferSource();s.buffer=b;s.connect(off.destination);s.start();return (await off.startRendering()).getChannelData(0)}
+async function track(x){const n=Math.floor((x.length-WIN)/HOP);if(n<=0)return{midi:[],db:[]};const midi=new Float32Array(n),db=new Float32Array(n);
+  let pk=1e-9;for(let i=0;i<x.length;i+=16)pk=Math.max(pk,Math.abs(x[i]));
+  for(let f=0;f<n;f++){const o=f*HOP;let e=0;for(let i=0;i<WIN;i++)e+=x[o+i]*x[o+i];db[f]=20*Math.log10(Math.sqrt(e/WIN)/pk+1e-9);
+    if(db[f]>-38){const hz=yin(x,o,MINL,MAXL,dbuf);midi[f]=hz?69+12*Math.log2(hz/440):0}if(f%250===0)await new Promise(r=>setTimeout(r,0))}
+  const out=[];for(let f=0;f<n;f++){const w=[];for(let k=-2;k<=2;k++){const v=midi[f+k];if(v)w.push(v)}if(!midi[f]||w.length<3){out.push(0);continue}w.sort((a,b)=>a-b);const med=w[w.length>>1];out.push(Math.abs(midi[f]-med)>1?med:midi[f])}
+  return{midi:out,db:Array.from(db)}}
+const pct=(a,p)=>{if(!a.length)return 0;const s=[...a].sort((x,y)=>x-y);return s[Math.min(s.length-1,Math.floor(p*s.length))]};
+const sd=a=>{if(a.length<2)return 0;const m=a.reduce((x,y)=>x+y,0)/a.length;return Math.sqrt(a.reduce((x,y)=>x+(y-m)**2,0)/a.length)};
+function metrics({midi,db}){
+  const vi=[];midi.forEach((m,i)=>{if(m>0)vi.push(i)});if(vi.length<FPS*1.5)return null;
+  const phr=[];let st=-1,last=-1;midi.forEach((m,i)=>{if(m>0){if(st<0)st=i;else if(i-last>FPS*.3){phr.push([st,last]);st=i}last=i}});if(st>=0)phr.push([st,last]);
+  const P=phr.filter(p=>p[1]-p[0]>FPS*.5),pl=P.map(p=>(p[1]-p[0])/FPS);
+  const notes=[];let s0=-1;for(let i=0;i<=midi.length;i++){const m=midi[i]||0;if(s0>=0){const med=pct(midi.slice(s0,i),.5);if(!m||Math.abs(m-med)>.7){if(i-s0>=FPS*.25)notes.push([s0,i]);s0=m?i:-1}}else if(m)s0=i}
+  let cs=0,sn=0;vi.forEach(i=>{const a=2*Math.PI*(midi[i]-Math.round(midi[i]));cs+=Math.cos(a);sn+=Math.sin(a)});const off=Math.atan2(sn,cs)/(2*Math.PI);
+  const stab=[],tune=[],meds=[];let scoop=0,vib=0,longN=0;
+  notes.forEach(([a,b])=>{const seg=midi.slice(a,b),core=seg.slice(Math.floor(seg.length*.25)),med=pct(core,.5);meds.push(med);stab.push(sd(core)*100);const c=med-off;tune.push(Math.abs(c-Math.round(c))*100);if(med-seg[0]>.5)scoop++;
+    if(b-a>FPS*.6){longN++;const dt=core.map(v=>v-med);let z=0;for(let k=1;k<dt.length;k++)if((dt[k-1]<0)!==(dt[k]<0))z++;const rate=z/2/(core.length/FPS),dep=sd(dt)*141;if(rate>4&&rate<8&&dep>15&&dep<120)vib++}});
+  let drops=0;P.forEach(([a,b])=>{const e=midi.slice(Math.max(a,b-15),b+1).filter(Boolean),p=midi.slice(Math.max(a,b-50),b-15).filter(Boolean);if(e.length&&p.length&&pct(p,.5)-pct(e,.5)>.6)drops++});
+  const ms=vi.map(i=>midi[i]),hc=pct(ms,.85),hs=stab.filter((v,k)=>meds[k]>=hc),dbs=vi.map(i=>db[i]);
+  const r={dur:midi.length/FPS,lo:pct(ms,.05),hi:pct(ms,.95),stab:Math.round(stab.length?pct(stab,.5):0),hiStab:Math.round(hs.length?hs.reduce((x,y)=>x+y,0)/hs.length:0),
+    tune:Math.round(tune.length?tune.reduce((x,y)=>x+y,0)/tune.length:0),scoop:notes.length?scoop/notes.length:0,vib:longN?vib/longN:0,endDrop:P.length?drops/P.length:0,
+    phrase:pl.length?pl.reduce((x,y)=>x+y,0)/pl.length:0,dyn:pct(dbs,.9)-pct(dbs,.1),notes:notes.length};
+  const c=v=>Math.max(0,Math.min(1,v));
+  r.score=Math.round(100*(.35*c(1-(r.stab-8)/30)+.25*c(1-(r.tune-10)/30)+.15*c(1-r.endDrop/.5)+.15*c((r.dyn-4)/12)+.10*c((r.phrase-1.5)/3)));
+  const step=Math.round(FPS/10);r.contour=[];for(let i=0;i<midi.length;i+=step){const w=midi.slice(i,i+step).filter(Boolean);r.contour.push(w.length?Math.round(pct(w,.5)*10)/10:0)}
+  return r}
+function wav(pcm,rate){const b=new ArrayBuffer(44+pcm.length*2),v=new DataView(b),w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};
+  w(0,'RIFF');v.setUint32(4,36+pcm.length*2,true);w(8,'WAVEfmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,rate,true);v.setUint32(28,rate*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,pcm.length*2,true);
+  for(let i=0;i<pcm.length;i++){const s=Math.max(-1,Math.min(1,pcm[i]));v.setInt16(44+i*2,s<0?s*0x8000:s*0x7fff,true)}return new Blob([b],{type:'audio/wav'})}
+
+async function analyzeTake(pcm,rate){
+  try{
+    if(pcm.length<rate*2)throw new Error('short');
+    const x=await resample(pcm,rate);const m=metrics(await track(x));if(!m)throw new Error('novoice');
+    const l=phTakes(),p=l[l.length-1]||null;
+    const t={id:'t'+Date.now(),vid:cur,ph:ph().name,n:(p?p.n:0)+1,date:new Date().toISOString(),...m};
+    try{blobs[t.id]=URL.createObjectURL(wav(pcm,rate))}catch(e){}
+    takes.push(t);if(takes.length>400)takes=takes.slice(-400);save();
+    $('#liveSub').textContent='테이크 #'+t.n+' · '+t.score+'점';status(`테이크 #${t.n} ${t.score}점. 레슨을 확인하고 같은 구절을 다시 불러 보세요.`);
+    renderAll();showTake(t);await lesson(t,p);
+  }catch(e){$('#liveSub').textContent='';status(e.message==='short'?'녹음이 너무 짧아요. 2초 이상 불러 주세요.':e.message==='novoice'?'목소리가 잘 잡히지 않았어요. 이어폰을 끼고 반주 소리가 마이크에 들어가지 않게 한 뒤 다시 불러 주세요.':'분석 중 문제가 생겼어요. 다시 녹음해 주세요.')}
+}
+
+/* ---------- views ---------- */
+const g3=(v,good,bad,low=true)=>low?(v<=good?'good':v>=bad?'bad':'warn'):(v>=good?'good':v<=bad?'bad':'warn');
+function dl(v,p,low,u,dec=0){if(p==null)return '<span class="d">&nbsp;</span>';const d=v-p;if(Math.abs(d)<(dec?.1:1))return '<span class="d" style="color:var(--muted)">변화 없음</span>';const ok=low?d<0:d>0;return `<span class="d ${ok?'good':'bad'}">${d>0?'▲':'▼'}${Math.abs(d).toFixed(dec)}${u}</span>`}
+function showTake(t){
+  const l=phTakes(),i=l.indexOf(t),p=i>0?l[i-1]:null;
+  const k=(n,v,c,d,big)=>`<div class="k${big?' big':''}"><span class="t">${n}</span><span class="v ${c||''}">${v}</span>${d}</div>`;
+  $('#kpis').innerHTML=t?(k('점수',t.score,'',dl(t.score,p?.score,false,'점'),true)+k('음 유지 흔들림',t.stab+'c',g3(t.stab,12,25),dl(t.stab,p?.stab,true,'c'))+
+    k('끝음 처짐',Math.round(t.endDrop*100)+'%',g3(t.endDrop*100,20,45),dl(Math.round(t.endDrop*100),p?Math.round(p.endDrop*100):null,true,'%'))+
+    k('호흡 길이',t.phrase.toFixed(1)+'초',g3(t.phrase,3.5,2,false),dl(t.phrase,p?.phrase,false,'초',1))+
+    k('반음 정확도',t.tune+'c',g3(t.tune,14,25),dl(t.tune,p?.tune,true,'c'))+k('고음 흔들림',t.hiStab?t.hiStab+'c':'-',t.hiStab?g3(t.hiStab,15,30):'',dl(t.hiStab,p?.hiStab,true,'c'))+
+    k('강약 폭',t.dyn.toFixed(1)+'dB',g3(t.dyn,12,6,false),dl(t.dyn,p?.dyn,false,'dB',1))+k('음역',`<span style="font-size:12px">${nn(t.lo)}~${nn(t.hi)}</span>`,'','<span class="d">&nbsp;</span>')):'';
+  drawChart(t?l.slice(Math.max(0,i-2),i+1):[]);
+  if(t){$('#lesson').innerHTML=t.lesson?md(t.lesson):'<p class="hint">레슨 준비 중…</p>';$('#lessonSrc').textContent=t.src||''}
+  const pl=$('#player');if(t&&blobs[t.id]){pl.src=blobs[t.id];pl.hidden=false}else pl.hidden=true;
+}
+function drawChart(list){const cv=$('#chart'),dpr=devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.scale(dpr,dpr);
+  const cs=getComputedStyle(document.documentElement),col=n=>cs.getPropertyValue(n).trim();
+  if(!list.length){g.fillStyle=col('--muted');g.font='13px '+col('--body');g.textAlign='center';g.fillText('녹음하면 테이크별 음정 흐름이 겹쳐 그려져요',w/2,h/2);return}
+  const all=list.flatMap(t=>t.contour).filter(Boolean),lo=Math.floor(pct(all,.01))-1,hi=Math.ceil(pct(all,.99))+1,len=Math.max(...list.map(t=>t.contour.length)),L=34,R=6,T=6,B=16;
+  const X=i=>L+(w-L-R)*i/Math.max(1,len-1),Y=m=>T+(h-T-B)*(1-(m-lo)/Math.max(1,hi-lo));g.font='10px '+col('--mono');
+  for(let m=lo;m<=hi;m++){const p=(m%12+12)%12,nat=[0,2,4,5,7,9,11].includes(p);g.strokeStyle=col('--line');g.globalAlpha=nat?1:.4;g.beginPath();g.moveTo(L,Y(m));g.lineTo(w-R,Y(m));g.stroke();g.globalAlpha=1;
+    if(nat&&(hi-lo<=16||p===0||p===7)){g.fillStyle=col('--muted');g.fillText(NOTE[p],3,Y(m)+3)}}
+  g.fillStyle=col('--muted');const dur=len/10,st=dur>40?10:dur>15?5:2;for(let t=0;t<=dur;t+=st)g.fillText(t+'초',Math.min(X(t*10),w-26),h-3);
+  list.forEach((t,k)=>{const me=k===list.length-1;g.strokeStyle=col(me?'--pitch':'--ghost');g.globalAlpha=me?1:.6;g.lineWidth=me?2.4:1.4;g.beginPath();let pen=false;
+    t.contour.forEach((m,i)=>{if(!m){pen=false;return}if(!pen){g.moveTo(X(i),Y(m));pen=true}else g.lineTo(X(i),Y(m))});g.stroke();g.globalAlpha=1})}
+function renderTakes(){const box=$('#takes'),l=phTakes();box.textContent='';
+  if(!l.length){box.innerHTML='<p class="hint">아직 테이크가 없어요.</p>';return}
+  l.slice().reverse().forEach(x=>{const i=l.indexOf(x),p=l[i-1],d=document.createElement('div');d.className='take';
+    d.innerHTML=`<span class="n">#${x.n}</span><span class="s">${x.score}점</span><span class="m">${p?(x.score>=p.score?'▲':'▼')+Math.abs(x.score-p.score)+' · ':''}흔들림 ${x.stab}c · 호흡 ${x.phrase.toFixed(1)}초</span>`;
+    const v=document.createElement('button');v.textContent=blobs[x.id]?'듣기·보기':'보기';v.onclick=()=>{showTake(x);if(blobs[x.id])$('#player').play().catch(()=>{})};d.appendChild(v);box.appendChild(d)})}
+
+/* ---------- lesson ---------- */
+function md(t){let h='',ul=false;t.split('\n').forEach(line=>{const l=line.trim();
+  if(/^#{1,4}\s/.test(l)){if(ul){h+='</ul>';ul=false}h+='<h4>'+esc(l.replace(/^#+\s*/,''))+'</h4>'}
+  else if(/^[-*•]\s/.test(l)){if(!ul){h+='<ul>';ul=true}h+='<li>'+esc(l.replace(/^[-*•]\s*/,'')).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')+'</li>'}
+  else if(l){if(ul){h+='</ul>';ul=false}h+='<p>'+esc(l).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')+'</p>'}});if(ul)h+='</ul>';return h}
+const DRILL={
+  stab:['**긴 음이 흔들려요.** 숨을 아끼지 말고 일정한 양으로 내보내세요. 배를 천천히 안쪽으로 조이며 소리를 받쳐 주는 느낌입니다.','"스-" 소리로 15초 일정하게 내쉬기 2회, 이어서 이 구절의 가장 긴 음을 "우-"로 5초 유지'],
+  end:['**프레이즈 끝음이 내려가요.** 마지막 글자에서 힘이 빠지며 음이 처지는 습관이에요. 끝음은 한 음 높이 생각하고 배의 지지를 끝까지 유지하세요.','구절 마지막 두 단어만 "냐"로 3번 부르며 끝음 높이를 유지한 뒤 가사로 부르기'],
+  hi:['**고음에서 더 흔들려요.** 목을 조여 밀어 올리고 있을 가능성이 커요. 고음 직전에 숨을 미리 채우고, 턱을 살짝 내린 채 "어" 입모양으로 소리를 둥글게 만드세요.','립트릴(입술 부르르)로 고음 구간 멜로디를 3번 따라 부른 뒤 같은 높이를 "냐"로'],
+  tune:['**음 중심이 조금씩 비껴가요.** 각 음에 닿은 뒤 미세하게 높거나 낮게 머무는 경우예요. 원곡을 한 번 더 듣고 음 하나하나를 허밍으로 맞춰 보세요.','"음~" 허밍으로 구절 멜로디를 천천히 1번, 실시간 음정 표시를 보며 각 음에서 선이 평평하게 유지되는지 확인'],
+  dyn:['**강약이 평평해요.** 발라드는 작게 시작해 키우는 흐름이 감정을 만들어요. 구절 앞부분은 말하듯 작게, 핵심 단어에서만 키우세요.','같은 구절을 볼륨 3단계(작게·보통·크게)로 한 번씩 불러 차이 느끼기'],
+  breath:['**호흡이 짧아요.** 숨이 중간에 끊기면 프레이즈가 조각나요. 숨 쉴 자리를 미리 한 곳만 정하고, 그 앞까지 한 호흡으로 가세요.','코와 입으로 2초 동안 배·옆구리를 부풀려 들이마시고 8초 동안 "스-" 내쉬기 3회'],
+  scoop:['**음을 아래에서 밀어 올려 시작해요.** 습관적인 스쿱은 음정이 불안하게 들리게 해요. 첫 음 높이를 머릿속에 먼저 떠올리고 바로 그 음에서 시작하세요.','구절 첫 음만 "음-"으로 정확히 잡은 뒤 바로 가사로 이어 부르기 3회']};
+function localLesson(t,p){
+  const iss=[];if(t.endDrop>.3)iss.push(['end',t.endDrop*2]);if(t.stab>15)iss.push(['stab',t.stab/15]);if(t.hiStab&&t.hiStab>t.stab+6)iss.push(['hi',t.hiStab/18]);
+  if(t.tune>16)iss.push(['tune',t.tune/16]);if(t.dyn<9)iss.push(['dyn',9/Math.max(1,t.dyn)]);if(t.phrase<2.5)iss.push(['breath',2.5/Math.max(.5,t.phrase)]);if(t.scoop>.4)iss.push(['scoop',t.scoop*2]);
+  iss.sort((a,b)=>b[1]-a[1]);
+  const o=['## 이번 테이크'];
+  if(p){const d=t.score-p.score;o.push(`- 직전 #${p.n} ${p.score}점 → ${t.score}점 (${d>=0?'+':''}${d}). `+(d>=3?'좋아졌어요.':d<=-3?'조금 흔들렸어요. 힘을 빼고 다시 해 봐요.':'비슷한 수준이에요.'));
+    const imp=[];if(p.stab-t.stab>=3)imp.push(`음 유지 흔들림 ${p.stab}c→${t.stab}c`);if(p.endDrop-t.endDrop>=.15)imp.push('끝음 처짐 감소');if(t.dyn-p.dyn>=1.5)imp.push(`강약 폭 ${p.dyn.toFixed(1)}→${t.dyn.toFixed(1)}dB`);if(t.phrase-p.phrase>=.4)imp.push('호흡이 길어짐');
+    if(imp.length)o.push('- 좋아진 점: '+imp.join(', '))}
+  else o.push(`- 첫 테이크 ${t.score}점. 음역 ${nn(t.lo)}~${nn(t.hi)}로 불렀어요.`);
+  o.push('## 다음 테이크에서 딱 하나');
+  if(iss.length){const d=DRILL[iss[0][0]];o.push('- '+d[0]);o.push('## 30초 준비 동작');o.push('- '+d[1]);if(iss[1])o.push('- 그다음 과제: '+DRILL[iss[1][0]][0].match(/\*\*(.+?)\*\*/)[1])}
+  else{o.push('- **안정적이에요.** 이제 가사 첫 글자를 또렷하게, 핵심 단어에 감정을 실어 보세요. 긴 음 끝에 살짝 비브라토를 넣어 봐도 좋아요.');o.push('## 30초 준비 동작');o.push('- 가사를 노래 없이 감정을 넣어 소리 내어 읽기 1번')}
+  return o.join('\n')}
+async function lesson(t,p){
+  const box=$('#lesson');
+  if(!cfg.ai){t.lesson=localLesson(t,p);t.src='내장 레슨';box.innerHTML=md(t.lesson);$('#lessonSrc').textContent=t.src;save();return}
+  box.innerHTML='<p class="hint">Claude가 레슨을 쓰는 중…</p>';$('#lessonSrc').textContent='Claude';
+  const s=song(),hist=phTakes().slice(-5).map(x=>`#${x.n} ${x.score}점(흔들림${x.stab}c 끝음처짐${Math.round(x.endDrop*100)}% 호흡${x.phrase.toFixed(1)}초)`).join(', ');
+  const prompt=`당신은 한국 발라드 보컬 트레이너입니다. 50대 남성 취미 학습자가 같은 구절을 반복해 부르며 테이크마다 바로 레슨을 받습니다. 짧고 구체적으로, 따뜻하지만 솔직하게.
+영상: ${s.title} (${s.ch}) / 구절: ${t.ph} / 테이크 #${t.n}
+이번: 점수 ${t.score}, 음 유지 흔들림 ${t.stab}c(12↓좋음), 반음 정확도 ${t.tune}c(14↓좋음), 고음 흔들림 ${t.hiStab}c, 끝음 처짐 ${Math.round(t.endDrop*100)}%, 강약 폭 ${t.dyn.toFixed(1)}dB(12↑좋음), 평균 호흡 ${t.phrase.toFixed(1)}초, 밀어올리기 ${Math.round(t.scoop*100)}%, 비브라토 ${Math.round(t.vib*100)}%, 음역 ${nn(t.lo)}~${nn(t.hi)}
+${p?`직전 #${p.n}: 점수 ${p.score}, 흔들림 ${p.stab}c, 끝음 처짐 ${Math.round(p.endDrop*100)}%, 강약 ${p.dyn.toFixed(1)}dB, 호흡 ${p.phrase.toFixed(1)}초`:'첫 테이크.'}
+기록: ${hist}
+녹음된 목소리만 분석한 값이며 원곡과 비교한 값은 아닙니다. 가사는 인용하지 마세요.
+한국어 250~400자, "## 제목"과 "- 항목"만 사용:
+## 이번 테이크
+## 다음 테이크에서 딱 하나
+## 30초 준비 동작`;
+  try{const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':cfg.ai,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-5-5',max_tokens:800,messages:[{role:'user',content:prompt}]})});
+    const j=await r.json();if(!r.ok)throw new Error(j.error?.message||r.status);
+    t.lesson=j.content.map(c=>c.text||'').join('');t.src='Claude'}
+  catch(e){t.lesson=localLesson(t,p);t.src='내장 레슨 (Claude 연결 실패)'}
+  box.innerHTML=md(t.lesson);$('#lessonSrc').textContent=t.src;save()}
+
+function renderAll(){renderLib();renderPhrases();renderTakes();const l=phTakes();showTake(l[l.length-1]||null);if(!l.length){$('#lesson').innerHTML='<p class="hint">'+(song()?'이 구절을 녹음하면 여기에 레슨이 나와요. 같은 구절을 다시 부르면 이전 테이크와 비교해 드려요.':'노래를 고르고 구절을 녹음하면 레슨이 나와요.')+'</p>';$('#lessonSrc').textContent=''}}
+window.addEventListener('resize',()=>{const l=phTakes();drawChart(l.slice(-3))});
+renderResultsHint();if(cur)load(cur);if(songs.length&&!cur){}renderAll();
+})();
+</script>
+</body>
+</html>
