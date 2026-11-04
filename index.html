@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>발라드 보컬 코치</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -210,12 +211,17 @@ $('#setBtn').onclick=()=>{$('#ytKey').value=cfg.yt;$('#aiKey').value=cfg.ai;$('#
 $('#dlgClose').onclick=()=>{cfg={yt:$('#ytKey').value.trim(),ai:$('#aiKey').value.trim()};store.set('vc.cfg',cfg);$('#dlg').close();renderResultsHint()};
 
 /* ---------- YouTube player ---------- */
-let player=null,ready=false,pendingVid=null;
-window.onYouTubeIframeAPIReady=()=>{
-  player=new YT.Player('yt',{width:'100%',height:'100%',playerVars:{playsinline:1,rel:0,modestbranding:1},
-    events:{onReady:()=>{ready=true;if(pendingVid)load(pendingVid)},onError:e=>{status((e.data===101||e.data===150)?'이 영상은 다른 사이트에서 재생이 막혀 있어요. 같은 곡의 다른 영상(노래방 채널 등)을 골라 주세요.':'영상을 불러오지 못했어요. 다른 영상을 선택해 주세요.')}}});
-};
-function load(vid){if(!ready){pendingVid=vid;return}$('#videoEmpty').hidden=true;player.cueVideoById(vid)}
+let player=null,ready=false,apiReady=!!(window.YT&&YT.Player),pendingVid=null;
+window.onYouTubeIframeAPIReady=()=>{apiReady=true;if(pendingVid){const v=pendingVid;pendingVid=null;load(v)}};
+function ytError(e){status((e.data===101||e.data===150)?'이 영상은 다른 사이트에서 재생이 막혀 있어요. 같은 곡의 다른 영상(TJ·금영 노래방 채널 등)을 골라 주세요.':'영상을 불러오지 못했어요. 다른 영상을 선택해 주세요.')}
+function load(vid){
+  if(!apiReady){pendingVid=vid;return}
+  $('#videoEmpty').hidden=true;
+  if(!player){player=new YT.Player('yt',{width:'100%',height:'100%',videoId:vid,
+      playerVars:{playsinline:1,rel:0,enablejsapi:1,origin:location.origin},
+      events:{onReady:()=>{ready=true;if(pendingVid){const v=pendingVid;pendingVid=null;player.cueVideoById(v)}},onError:ytError}});return}
+  if(ready)player.cueVideoById(vid);else pendingVid=vid;
+}
 const vt=()=>player&&ready&&player.getCurrentTime?player.getCurrentTime():0;
 
 /* ---------- songs ---------- */
@@ -231,16 +237,38 @@ function itemEl(s,lib){
 }
 function renderLib(){const box=$('#lib');box.textContent='';if(!songs.length)box.innerHTML='<p class="hint">아직 연습곡이 없어요. 노래 검색에서 곡을 고르면 여기에 저장돼요.</p>';songs.forEach(s=>box.appendChild(itemEl(s,true)))}
 function renderResultsHint(){if($('#results').childElementCount)return;
-  $('#results').innerHTML=cfg.yt?'<p class="hint">곡명이나 가수를 검색하세요.</p>':'<p class="banner">바로 검색하려면 <b>설정</b>에 유튜브 검색 키를 넣어 주세요. 키가 없을 때는 유튜브에서 곡을 찾아 <b>공유 → 링크 복사</b> 후 위 칸에 붙여넣으면 됩니다.</p>'}
+  $('#results').innerHTML='<p class="hint">곡명이나 가수를 검색하면 결과가 여기에 나와요. 결과를 누르면 왼쪽 화면에서 바로 재생됩니다.</p>'}
 $('#sForm').addEventListener('submit',async e=>{e.preventDefault();const q=$('#q').value.trim();if(!q)return;$('#q').blur();
   const box=$('#results');
-  if(!cfg.yt){box.innerHTML='<p class="banner">검색 키가 없어 이 화면에서 검색할 수 없어요. <b>설정</b>에 키를 넣거나, <a style="color:var(--accent)" target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query='+encodeURIComponent(q+($('#mrOnly').checked?' 노래방':''))+'">유튜브에서 찾아</a> 링크를 복사해 붙여넣으세요.</p>';return}
+  const full=q+($('#mrOnly').checked?' 노래방':'');
   box.innerHTML='<p class="hint">검색 중…</p>';
+  if(!cfg.yt){
+    try{const items=await freeSearch(full);box.textContent='';items.forEach(it=>box.appendChild(itemEl(it,false)));
+      if(!items.length)box.innerHTML='<p class="hint">결과가 없어요. 다른 검색어로 찾아보세요.</p>';
+      else box.insertAdjacentHTML('beforeend','<p class="hint">키 없이 검색하는 무료 방식이라 가끔 느리거나 안 될 수 있어요. 설정에 유튜브 검색 키를 넣으면 항상 안정적으로 검색돼요.</p>')}
+    catch(e){box.innerHTML='<p class="banner">지금은 키 없이 검색이 안 돼요. 잠시 뒤 다시 시도하거나, <b>설정</b>에 유튜브 검색 키를 넣어 주세요.</p>'}
+    return}
   try{const u='https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoEmbeddable=true&maxResults=10&regionCode=KR&q='+encodeURIComponent(q+($('#mrOnly').checked?' 노래방 MR':''))+'&key='+encodeURIComponent(cfg.yt);
     const r=await fetch(u);const j=await r.json();if(!r.ok)throw new Error(j.error?.message||r.status);
     box.textContent='';(j.items||[]).forEach(it=>box.appendChild(itemEl({vid:it.id.videoId,title:unesc(it.snippet.title),ch:unesc(it.snippet.channelTitle),thumb:it.snippet.thumbnails?.medium?.url},false)));
     if(!box.childElementCount)box.innerHTML='<p class="hint">결과가 없어요. 다른 검색어로 찾아보세요.</p>'}
   catch(err){box.innerHTML='<p class="banner">검색하지 못했어요. 설정의 유튜브 검색 키를 확인해 주세요. ('+esc(err.message)+')</p>'}});
+/* keyless search through public YouTube front-ends; tried in order, first answer wins */
+const PIPED=['https://pipedapi.kavin.rocks','https://pipedapi.adminforge.de','https://api.piped.private.coffee','https://pipedapi.reallyaweso.me'];
+const INV=['https://inv.nadeko.net','https://invidious.nerdvpn.de','https://iv.melmac.space','https://invidious.privacyredirect.com'];
+function tfetch(u,ms=7000){const c=new AbortController();const t=setTimeout(()=>c.abort(),ms);return fetch(u,{signal:c.signal}).finally(()=>clearTimeout(t))}
+async function freeSearch(q){
+  const tries=[
+    ...PIPED.map(b=>async()=>{const r=await tfetch(b+'/search?filter=videos&q='+encodeURIComponent(q));if(!r.ok)throw 0;const j=await r.json();
+      return (j.items||[]).filter(i=>i.url&&i.url.includes('v=')).map(i=>({vid:i.url.split('v=')[1].slice(0,11),title:i.title,ch:i.uploaderName||'',thumb:'https://i.ytimg.com/vi/'+i.url.split('v=')[1].slice(0,11)+'/mqdefault.jpg'}))}),
+    ...INV.map(b=>async()=>{const r=await tfetch(b+'/api/v1/search?type=video&region=KR&q='+encodeURIComponent(q));if(!r.ok)throw 0;const j=await r.json();
+      return (Array.isArray(j)?j:[]).filter(i=>i.videoId).map(i=>({vid:i.videoId,title:i.title,ch:i.author||'',thumb:'https://i.ytimg.com/vi/'+i.videoId+'/mqdefault.jpg'}))})];
+  // race in small batches so one dead server doesn't stall the search
+  for(let i=0;i<tries.length;i+=3){
+    try{const res=await Promise.any(tries.slice(i,i+3).map(f=>f().then(a=>{if(!a.length)throw 0;return a})));return res.slice(0,10)}catch(e){}
+  }
+  throw new Error('none');
+}
 function parseVid(s){s=s.trim();const m=s.match(/(?:v=|youtu\.be\/|shorts\/|embed\/|live\/)([\w-]{11})/);return m?m[1]:(/^[\w-]{11}$/.test(s)?s:null)}
 $('#linkBtn').onclick=async()=>{const vid=parseVid($('#link').value);if(!vid){status('유튜브 링크를 인식하지 못했어요. 공유 → 링크 복사로 받은 주소를 붙여넣어 주세요.');return}
   let title='유튜브 영상',ch='';try{const r=await fetch('https://www.youtube.com/oembed?format=json&url='+encodeURIComponent('https://www.youtube.com/watch?v='+vid));if(r.ok){const j=await r.json();title=j.title;ch=j.author_name}}catch(e){}
