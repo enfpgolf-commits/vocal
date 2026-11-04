@@ -155,7 +155,7 @@ dialog label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
       <div id="pSearch" class="col">
         <form id="sForm" class="row"><input id="q" class="grow" placeholder="곡명 또는 가수 (예: 성시경 거리에서)" enterkeyhint="search" autocomplete="off"><button class="primary" type="submit">검색</button></form>
         <div class="row"><input id="link" class="grow" placeholder="또는 유튜브 링크 붙여넣기" autocomplete="off"><button id="linkBtn">열기</button></div>
-        <label class="row hint" style="gap:6px"><input type="checkbox" id="mrOnly" checked style="width:auto;min-height:0"> 노래방(MR) 영상 위주로 찾기</label>
+        <label class="row hint" style="gap:6px"><input type="checkbox" id="mrOnly" checked style="width:auto;min-height:0"> MR(반주) 영상 위주로 찾기</label>
         <div class="list" id="results"></div>
       </div>
       <div id="pLib" class="col" hidden><div class="list" id="lib"></div></div>
@@ -213,8 +213,28 @@ $('#dlgClose').onclick=()=>{cfg={yt:$('#ytKey').value.trim(),ai:$('#aiKey').valu
 /* ---------- YouTube player ---------- */
 let player=null,ready=false,apiReady=!!(window.YT&&YT.Player),pendingVid=null;
 window.onYouTubeIframeAPIReady=()=>{apiReady=true;if(pendingVid){const v=pendingVid;pendingVid=null;load(v)}};
-function ytError(e){status((e.data===101||e.data===150)?'이 영상은 다른 사이트에서 재생이 막혀 있어요. 같은 곡의 다른 영상(TJ·금영 노래방 채널 등)을 골라 주세요.':'영상을 불러오지 못했어요. 다른 영상을 선택해 주세요.')}
+let curVid=null,lastResults=[];
+let blocked=store.get('vc.blocked',[]);
+const BLOCK_CH=/TJ노래방|TJ Karaoke|TJ Media/i; // TJ 공식 채널은 외부 사이트 재생을 막아 둠
+function ytError(e){
+  const embedBlocked=[101,150,152,153].includes(e.data)||e.data===100;
+  if(!embedBlocked){status('영상을 불러오지 못했어요. 다른 영상을 선택해 주세요.');return}
+  const bad=curVid;if(bad&&!blocked.includes(bad)){blocked.push(bad);store.set('vc.blocked',blocked.slice(-500))}
+  songs=songs.filter(s=>s.vid!==bad);if(cur===bad)cur=null;save();
+  const next=lastResults.find(r=>!blocked.includes(r.vid));
+  if(next){status('이 영상은 주인이 다른 사이트 재생을 막아 둬서 다음 영상으로 바꿨어요.');renderResults(lastResults);addSong(next)}
+  else{status('재생이 막힌 영상이에요. 검색어에 "MR"이나 "반주"를 붙여 다른 영상을 찾아 주세요.');renderResults(lastResults);renderAll()}
+}
+function renderResults(items){
+  const box=$('#results');box.textContent='';
+  const ok=items.filter(it=>!blocked.includes(it.vid));
+  ok.forEach(it=>box.appendChild(itemEl(it,false)));
+  const hidden=items.length-ok.length;
+  if(!ok.length)box.innerHTML='<p class="hint">재생 가능한 영상을 찾지 못했어요. 검색어를 바꿔 보세요. 예: "거리에서 MR", "거리에서 반주"</p>';
+  if(hidden)box.insertAdjacentHTML('beforeend','<p class="hint">이 화면에서 재생이 막힌 영상 '+hidden+'개(TJ노래방 공식 채널 등)는 숨겼어요.</p>');
+}
 function load(vid){
+  curVid=vid;
   if(!apiReady){pendingVid=vid;return}
   $('#videoEmpty').hidden=true;
   if(!player){player=new YT.Player('yt',{width:'100%',height:'100%',videoId:vid,
@@ -240,19 +260,23 @@ function renderResultsHint(){if($('#results').childElementCount)return;
   $('#results').innerHTML='<p class="hint">곡명이나 가수를 검색하면 결과가 여기에 나와요. 결과를 누르면 왼쪽 화면에서 바로 재생됩니다.</p>'}
 $('#sForm').addEventListener('submit',async e=>{e.preventDefault();const q=$('#q').value.trim();if(!q)return;$('#q').blur();
   const box=$('#results');
-  const full=q+($('#mrOnly').checked?' 노래방':'');
-  box.innerHTML='<p class="hint">검색 중…</p>';
-  if(!cfg.yt){
-    try{const items=await freeSearch(full);box.textContent='';items.forEach(it=>box.appendChild(itemEl(it,false)));
-      if(!items.length)box.innerHTML='<p class="hint">결과가 없어요. 다른 검색어로 찾아보세요.</p>';
-      else box.insertAdjacentHTML('beforeend','<p class="hint">키 없이 검색하는 무료 방식이라 가끔 느리거나 안 될 수 있어요. 설정에 유튜브 검색 키를 넣으면 항상 안정적으로 검색돼요.</p>')}
-    catch(e){box.innerHTML='<p class="banner">지금은 키 없이 검색이 안 돼요. 잠시 뒤 다시 시도하거나, <b>설정</b>에 유튜브 검색 키를 넣어 주세요.</p>'}
-    return}
-  try{const u='https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoEmbeddable=true&maxResults=10&regionCode=KR&q='+encodeURIComponent(q+($('#mrOnly').checked?' 노래방 MR':''))+'&key='+encodeURIComponent(cfg.yt);
-    const r=await fetch(u);const j=await r.json();if(!r.ok)throw new Error(j.error?.message||r.status);
-    box.textContent='';(j.items||[]).forEach(it=>box.appendChild(itemEl({vid:it.id.videoId,title:unesc(it.snippet.title),ch:unesc(it.snippet.channelTitle),thumb:it.snippet.thumbnails?.medium?.url},false)));
-    if(!box.childElementCount)box.innerHTML='<p class="hint">결과가 없어요. 다른 검색어로 찾아보세요.</p>'}
-  catch(err){box.innerHTML='<p class="banner">검색하지 못했어요. 설정의 유튜브 검색 키를 확인해 주세요. ('+esc(err.message)+')</p>'}});
+  const mr=$('#mrOnly').checked;
+  box.innerHTML='<p class="hint">재생 가능한 영상을 찾는 중…</p>';
+  // MR 모드: TJ 공식 채널은 외부 재생이 막혀 있어 "MR"/"반주"로 찾고 TJ 채널은 뒤로 뺌
+  const queries=mr?[q+' MR',q+' 반주',q+' 노래방']:[q];
+  let items=[],err=null;
+  for(const qq of queries){
+    try{const got=cfg.yt?await keySearch(qq):await freeSearch(qq);got.forEach(g=>{if(!items.some(x=>x.vid===g.vid))items.push(g)})}catch(e){err=e}
+    if(items.filter(it=>!BLOCK_CH.test(it.ch)&&!blocked.includes(it.vid)).length>=6)break;
+  }
+  if(!items.length){box.innerHTML=cfg.yt?'<p class="banner">검색하지 못했어요. 설정의 유튜브 검색 키를 확인해 주세요.'+(err?' ('+esc(err.message)+')':'')+'</p>':'<p class="banner">지금은 키 없이 검색이 안 돼요. 잠시 뒤 다시 시도하거나, <b>설정</b>에 유튜브 검색 키를 넣어 주세요.</p>';return}
+  items.forEach(it=>{if(BLOCK_CH.test(it.ch)&&!blocked.includes(it.vid))blocked.push(it.vid)});store.set('vc.blocked',blocked.slice(-500));
+  lastResults=items.slice(0,24);renderResults(lastResults);
+  if(!cfg.yt)$('#results').insertAdjacentHTML('beforeend','<p class="hint">키 없이 검색하는 무료 방식이라 가끔 느리거나 안 될 수 있어요.</p>');
+});
+async function keySearch(q){const u='https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoEmbeddable=true&videoSyndicated=true&maxResults=15&regionCode=KR&q='+encodeURIComponent(q)+'&key='+encodeURIComponent(cfg.yt);
+  const r=await fetch(u);const j=await r.json();if(!r.ok)throw new Error(j.error?.message||r.status);
+  return (j.items||[]).map(it=>({vid:it.id.videoId,title:unesc(it.snippet.title),ch:unesc(it.snippet.channelTitle),thumb:it.snippet.thumbnails?.medium?.url}))}
 /* keyless search through public YouTube front-ends; tried in order, first answer wins */
 const PIPED=['https://pipedapi.kavin.rocks','https://pipedapi.adminforge.de','https://api.piped.private.coffee','https://pipedapi.reallyaweso.me'];
 const INV=['https://inv.nadeko.net','https://invidious.nerdvpn.de','https://iv.melmac.space','https://invidious.privacyredirect.com'];
@@ -265,7 +289,7 @@ async function freeSearch(q){
       return (Array.isArray(j)?j:[]).filter(i=>i.videoId).map(i=>({vid:i.videoId,title:i.title,ch:i.author||'',thumb:'https://i.ytimg.com/vi/'+i.videoId+'/mqdefault.jpg'}))})];
   // race in small batches so one dead server doesn't stall the search
   for(let i=0;i<tries.length;i+=3){
-    try{const res=await Promise.any(tries.slice(i,i+3).map(f=>f().then(a=>{if(!a.length)throw 0;return a})));return res.slice(0,10)}catch(e){}
+    try{const res=await Promise.any(tries.slice(i,i+3).map(f=>f().then(a=>{if(!a.length)throw 0;return a})));return res.slice(0,20)}catch(e){}
   }
   throw new Error('none');
 }
